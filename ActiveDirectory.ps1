@@ -1,5 +1,4 @@
-﻿
-<#
+﻿<#
 .SYNOPSIS
     Script RBAC inside AD for Cloud Assembly
 .AUTHOR
@@ -42,4 +41,15 @@ foreach($ser in $Service)
 foreach($prj in $Project)
 {
     New-ADGroup -Server win-ad.vworld.domain.local -Name $prj -GroupScope Global  -Credential $credential -Description "Project Groups for vRealize Automation RBAC"
+}
+
+$allGroups = $Organization + $Service + $Project
+foreach($group in $allGroups)
+{
+    $GroupObject = Get-ADGroup -Server win-ad.vworld.domain.local  $group -Credential $credential
+    if($GroupObject.DistinguishedName)
+    {
+        $GroupObject.DistinguishedName | Out-File -FilePath "C:\Data\VMware\Projects\vrealize\vRA8\groups.txt" -Append
+    }
+    Clear-Variable GroupObject
 }
